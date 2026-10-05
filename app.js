@@ -642,7 +642,7 @@
   loadQuestions();
 
   /* ---------- theming ---------- */
-  var THEMES = [["classic","Classic"],["lego","Lego"],["clay","Clay"],["pastel","Pastel"],["comic","Comic book"],["whiteboard","Whiteboard"],["anime","Anime"],["watercolor","Watercolor"],["university","University"],["professional","Professional"]];
+  var THEMES = [["classic","Classic"],["lego","Lego"],["clay","Clay"],["pastel","Pastel"],["comic","Comic book"],["whiteboard","Whiteboard"],["anime","Anime"],["watercolor","Watercolor"],["university","University"],["professional","Professional"],["vedic","Vedic"],["ayurveda","Ayurveda"],["history","Indian History"],["universe","Universe"],["maths","Maths"],["vmaths","Vedic Maths"],["geometry","Geometry"],["sanskrit","Sanskrit"],["exercise","Exercise"],["food","Food"],["yoga","Yoga"],["meditation","Meditation"],["brain","Healthy Brain"],["social","Talk to People"],["music","Music"],["art","Art"]];
   var tstate = { t: document.documentElement.getAttribute("data-theme") || "classic", m: document.documentElement.getAttribute("data-mode") || "system" };
   function applyTheme() {
     var d = document.documentElement, dark = tstate.m === "dark" || (tstate.m === "system" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
