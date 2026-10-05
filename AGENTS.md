@@ -22,5 +22,8 @@ Hard rules:
   an upgrade step in `js/progress-storage.js`.
 - Keep lines under 80 characters, one job per function, and a doc comment
   on every function.
+- To build a question bank from a book, follow "Build a question bank
+  from a book file" in `ai-context/recipes.md` (the tools in `tools/`).
+  Keep the working folder (`work/`) out of the published site.
 - Run `python3 tests/run_tests.py` after every change. All checks must
   pass.

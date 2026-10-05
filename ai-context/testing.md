@@ -12,7 +12,9 @@ headless Chromium, and checks:
 
 | Test function | What it proves |
 |---|---|
-| `test_every_question_type` | every question in `questions.json`, answered right gives "Marks: 1 out of 1", answered wrong gives "0 out of 1", with no page errors |
+| `test_every_linked_file_exists` | every script, stylesheet and image `index.html` points to exists, and `helpers.js` loads first |
+| `test_every_question_is_well_formed` | every question passes `question_problems` from `tools/merge_question_bank.py`; ids are unique |
+| `test_every_question_type` | questions answered right give "Marks: 1 out of 1", wrong give "0 out of 1", with no page errors. All questions for a small bank; 3 per type for a large one; all with `--all` |
 | `test_confidence_check` | the answer area is locked until a confidence level is picked; a "Certain" miss is flagged on the results |
 | `test_timed_session` | the pill shows "Time left" and the card shows the session clock |
 | `test_question_timer_runs_out` | with a fake clock, an unanswered question shows "Time's up." |

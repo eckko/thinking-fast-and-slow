@@ -9,6 +9,10 @@ The script starts a small web server, opens the page in a headless
 browser and checks that every question type, the confidence check, the
 timed session, saved progress, book labels and themes all work. It
 prints PASS or FAIL for each check and exits with 1 if anything failed.
+
+Every question is checked for correct fields. In the browser, a large
+bank is sampled (a few questions of each type); add --all to answer
+every question right and wrong (slow: about a second per question).
 """
 
 import json
@@ -20,11 +24,16 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+from merge_question_bank import question_problems  # noqa: E402
+
 SITE_FOLDER = Path(__file__).resolve().parent.parent
 PORT = 8765
 PAGE_URL = f"http://localhost:{PORT}/index.html"
 BOOK = json.loads((SITE_FOLDER / "questions.json").read_text())
 
+ANSWER_EVERY_QUESTION = "--all" in sys.argv
+SAMPLE_PER_KIND = 3
 failures = []
 
 
@@ -124,10 +133,46 @@ def start_session(page, confidence=False, timed=False):
 # ------------------------------------------------------------- tests
 
 
+def test_every_question_is_well_formed():
+    """Every question has the fields its type needs (no browser)."""
+    print("Every question in questions.json has the right fields")
+    questions = BOOK["questions"]
+    broken = [f"{question.get('id')}: {'; '.join(problems)}"
+              for question in questions
+              for problems in [question_problems(question)] if problems]
+    ids = [question.get("id") for question in questions]
+    repeated = sorted({qid for qid in ids if ids.count(qid) > 1}) \
+        if len(ids) != len(set(ids)) else []
+    check(f"all {len(questions)} questions are well formed", not broken,
+          "; ".join(broken[:5]))
+    check("question ids are unique", not repeated, ", ".join(repeated[:5]))
+
+
+def questions_to_answer():
+    """All questions for a small bank or with --all; else a sample.
+
+    The sample takes a few questions of each type, spread across the
+    book, so every type is tried without taking an hour.
+    """
+    questions = BOOK["questions"]
+    if ANSWER_EVERY_QUESTION or len(questions) <= 8 * SAMPLE_PER_KIND:
+        return questions
+    sample = []
+    kinds = sorted({question["kind"] for question in questions})
+    for kind in kinds:
+        of_kind = [question for question in questions
+                   if question["kind"] == kind]
+        step = max(1, len(of_kind) // SAMPLE_PER_KIND)
+        sample.extend(of_kind[::step][:SAMPLE_PER_KIND])
+    return sample
+
+
 def test_every_question_type(browser):
     """Each question, right gives 1 mark and wrong gives 0."""
-    print("Every question in questions.json, answered right and wrong")
-    for question in BOOK["questions"]:
+    questions = questions_to_answer()
+    print(f"{len(questions)} of {len(BOOK['questions'])} questions, "
+          "answered right and wrong")
+    for question in questions:
         for answer_wrongly in (False, True):
             page = open_page(browser, questions=[question])
             start_session(page)
@@ -252,8 +297,9 @@ def test_book_labels(browser):
     page = open_page(browser, book=book)
     check("the chapter picker says Lesson",
           page.inner_text("#unit-picker-label") == "Lesson")
-    check("the summary says lessons",
-          "lessons" in page.inner_text("#book-summary"))
+    # "1 lesson" for a one-chapter book, "3 lessons" otherwise.
+    check("the summary counts lessons",
+          "lesson" in page.inner_text("#book-summary"))
     start_session(page)
     chip = page.inner_text(".unit-chip")
     check("the question shows the Lesson label", chip.startswith("Lesson"),
@@ -319,6 +365,7 @@ def main():
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
             test_every_linked_file_exists()
+            test_every_question_is_well_formed()
             test_every_question_type(browser)
             test_confidence_check(browser)
             test_timed_session(browser)

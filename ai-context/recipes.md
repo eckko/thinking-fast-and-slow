@@ -3,6 +3,23 @@
 Step-by-step instructions for the changes people ask for most. After any
 of them: run `python3 tests/run_tests.py`.
 
+## Build a question bank from a book file
+
+The `/quiz-book` skill does this end to end. By hand:
+
+1. `python3 tools/extract_book.py BOOK.pdf work/extract`
+2. Write `work/chapters.json` (format in the docstring of
+   `tools/plan_question_bank.py`): included chapters, pages, exact
+   sub-headings, weight 0.7 to 1.3, optional typeWeights.
+3. `python3 tools/plan_question_bank.py work/chapters.json --per-page 6`
+4. Write `work/questions/<idPrefix>.json` per chapter (check each with
+   `merge_question_bank.py work/question-plan.json --only <idPrefix>`).
+5. `python3 tools/merge_question_bank.py work/question-plan.json
+   --book-text work/extract/book-text.txt --output questions.json`
+6. `python3 tests/run_tests.py`
+
+Keep `work/` out of the published site.
+
 ## Set the site up for a different book
 
 1. Replace `questions.json`. Set a new unique `id` and the `book` title.
