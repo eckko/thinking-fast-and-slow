@@ -17,7 +17,7 @@ and JavaScript: no framework, no build step, nothing to install to use it.
 - [Testing](#testing)
 - [Code style](#code-style)
 
-AI agents: read [`AGENTS.md`](AGENTS.md) and the
+AI agents: read [`AGENTS.md`](docs/AGENTS.md) and the
 [`ai-context/`](ai-context/) folder first.
 
 ---
