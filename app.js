@@ -226,7 +226,7 @@
   function burst(node, n) {
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var r = node.getBoundingClientRect(), x = r.left + Math.min(r.width / 2, 60), y = r.top + r.height / 2;
-    var cols = ["#ff5d73", "#12b5a6", "#7c5cff", "#ff9f1c", "#2743d6", "#ffd400"];
+    var cs = getComputedStyle(document.documentElement), cols = ["--c1","--c2","--c3","--c4","--acc"].map(function (k) { return cs.getPropertyValue(k).trim(); }).filter(Boolean); if (!cols.length) cols = ["#ff5d73", "#12b5a6", "#7c5cff"];
     for (var i = 0; i < (n || 16); i++) {
       var d = el("div", "fx"), a = Math.random() * 6.283, dist = 50 + Math.random() * 70;
       d.style.left = x + "px"; d.style.top = y + "px"; d.style.background = cols[i % cols.length];
@@ -268,7 +268,7 @@
     return w;
   }
   function grade3(ok, n) { return ok === n ? "got" : ok >= Math.ceil(n / 2) ? "part" : "miss"; }
-  function actBtn(label, cls, fn) { var b = el("button", "btn " + (cls || ""), label); b.type = "button"; b.addEventListener("click", fn); return b; }
+  function actBtn(label, cls, fn) { var b = el("button", "btn " + (cls || "") + (/^Check/.test(label) ? " chk" : ""), label); b.type = "button"; b.addEventListener("click", fn); return b; }
 
   /* ---------- multiple choice (also true or false) ---------- */
   function mcq(q, area, keys) {
@@ -398,7 +398,7 @@
 
   /* ---------- match the pairs (tap left, then tap right) ---------- */
   var PAL = ["#ff5d73", "#12b5a6", "#7c5cff", "#ff9f1c", "#2743d6", "#1e8a63"];
-  function tint(c) { return "color-mix(in srgb," + c + " 16%,#fff)"; }
+  function tint(c) { return "color-mix(in srgb," + c + " 16%,var(--card))"; }
   function match(q, area, keys) {
     var L = q.pairs.map(function (p) { return p[0]; }), R = shuffle(q.pairs.map(function (p, i) { return { t: p[1], i: i }; }));
     var link = {}, selL = null, done = false, wrap = el("div", "match"), lc = el("div", "mcol"), rc = el("div", "mcol");
@@ -640,4 +640,31 @@
   });
 
   loadQuestions();
+
+  /* ---------- theming ---------- */
+  var THEMES = [["classic","Classic"],["lego","Lego"],["clay","Clay"],["pastel","Pastel"],["comic","Comic book"],["whiteboard","Whiteboard"],["anime","Anime"],["watercolor","Watercolor"],["university","University"],["professional","Professional"]];
+  var tstate = { t: document.documentElement.getAttribute("data-theme") || "classic", m: document.documentElement.getAttribute("data-mode") || "system" };
+  function applyTheme() {
+    var d = document.documentElement, dark = tstate.m === "dark" || (tstate.m === "system" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    d.setAttribute("data-theme", tstate.t); d.setAttribute("data-mode", tstate.m); d.setAttribute("data-scheme", dark ? "dark" : "light");
+    try { localStorage.setItem("recall-quiz:theme", JSON.stringify(tstate)); } catch (e) {}
+    var ms = document.querySelectorAll("#modeSegT button"), i, ts = document.querySelectorAll("#tiles .tile");
+    for (i = 0; i < ms.length; i++) ms[i].setAttribute("aria-pressed", ms[i].getAttribute("data-m") === tstate.m ? "true" : "false");
+    for (i = 0; i < ts.length; i++) ts[i].setAttribute("aria-pressed", ts[i].getAttribute("data-t") === tstate.t ? "true" : "false");
+  }
+  (function initTheme() {
+    var tiles = document.getElementById("tiles"), panel = document.getElementById("themePanel"), btn = document.getElementById("themeBtn");
+    if (!tiles || !btn) return;
+    THEMES.forEach(function (t) {
+      var b = el("button", "tile"); b.type = "button"; b.setAttribute("data-t", t[0]);
+      b.appendChild(el("div", "tmas")); var sw = el("div", "tsw"); sw.appendChild(el("i")); sw.appendChild(el("i")); sw.appendChild(el("i")); b.appendChild(sw);
+      b.appendChild(el("div", "tbtn", "Go")); b.appendChild(el("div", "tnm", t[1]));
+      b.addEventListener("click", function () { tstate.t = t[0]; applyTheme(); });
+      tiles.appendChild(b);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("#modeSegT button"), function (b) { b.addEventListener("click", function () { tstate.m = b.getAttribute("data-m"); applyTheme(); }); });
+    btn.addEventListener("click", function () { var open = panel.classList.toggle("hide") === false; btn.setAttribute("aria-expanded", open ? "true" : "false"); });
+    if (window.matchMedia) { var mq = matchMedia("(prefers-color-scheme: dark)"), f = function () { if (tstate.m === "system") applyTheme(); }; if (mq.addEventListener) mq.addEventListener("change", f); else if (mq.addListener) mq.addListener(f); }
+    applyTheme();
+  })();
 })();
