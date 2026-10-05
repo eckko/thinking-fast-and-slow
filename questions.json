@@ -1,0 +1,178 @@
+{
+  "id": "thinking-fast-and-slow",
+  "book": "Thinking, Fast and Slow",
+  "questions": [
+    {
+      "id": "c09-2",
+      "unit": "Chapter 9",
+      "unitTitle": "Answering an Easier Question",
+      "section": "Substituting Questions",
+      "kind": "mcq",
+      "q": "What is the difference between the target question and the heuristic question?",
+      "options": [
+        "The target question is the assessment you intend to produce; the heuristic question is the simpler question you answer instead.",
+        "The target question is answered by System 2 and the heuristic question by System 1, and both are answered every time.",
+        "The heuristic question is the hard one the experimenter asks; the target question is the one the participant invents.",
+        "The target question is always about probability; the heuristic question is always about feelings."
+      ],
+      "answer": 0,
+      "explain": "Substitution: “If a satisfactory answer to a hard question is not found quickly, System 1 will find a related question that is easier and will answer it.”"
+    },
+    {
+      "id": "c15-1",
+      "unit": "Chapter 15",
+      "unitTitle": "Linda: Less is More",
+      "section": "Opening",
+      "kind": "recall",
+      "q": "What is the conjunction fallacy, and why does the Linda problem demonstrate it?",
+      "a": "Judging a conjunction of two events as more probable than one of them in a direct comparison. Linda fits “feminist” better, so “feminist bank teller” was ranked more likely than “bank teller”, though every feminist bank teller is a bank teller: “When you specify a possible event in greater detail you can only lower its probability.” The problem sets representativeness against logic, and the error stays attractive even when recognised."
+    },
+    {
+      "id": "c09-3",
+      "unit": "Chapter 9",
+      "unitTitle": "Answering an Easier Question",
+      "section": "The Mood Heuristic for Happiness",
+      "kind": "tf",
+      "q": "True or false: When German students were asked how happy they were first, and how many dates they had last month second, the two answers were highly correlated.",
+      "answer": false,
+      "explain": "The correlation was about zero in that order. It was “about as high as correlations between psychological measures can get” only when the dating question came first, because the emotion it aroused was still present and System 1 had a ready answer."
+    },
+    {
+      "id": "c09-4",
+      "unit": "Chapter 9",
+      "unitTitle": "Answering an Easier Question",
+      "section": "Speaking of Substitution and Heuristics",
+      "kind": "multi",
+      "q": "Which of these does the author list among the characteristics of System 1?",
+      "options": [
+        "Operates automatically and quickly",
+        "Neglects ambiguity and suppresses doubt",
+        "Weighs the evidence it does not have as carefully as the evidence it has",
+        "Sometimes substitutes an easier question",
+        "Represents sets by their sums"
+      ],
+      "answers": [
+        0,
+        1,
+        3
+      ],
+      "explain": "System 1 focuses on existing evidence and ignores absent evidence (WYSIATI), and it represents sets by norms and prototypes, not by integrating them. The other three are on the author’s closing list."
+    },
+    {
+      "id": "c15-3",
+      "unit": "Chapter 15",
+      "unitTitle": "Linda: Less is More",
+      "section": "Less is More, Sometimes Even in Joint Evaluation",
+      "kind": "fill",
+      "q": "Probability, like economic value, is a sum-like variable, but the author says “System 1 averages instead of ____.”",
+      "accept": [
+        "adding",
+        "add"
+      ],
+      "explain": "This is why Hsee’s larger dinnerware set was valued less in single evaluation, and why Linda’s “feminist bank teller” felt more probable."
+    },
+    {
+      "id": "c09-5",
+      "unit": "Chapter 9",
+      "unitTitle": "Answering an Easier Question",
+      "section": "Place in the argument",
+      "kind": "order",
+      "q": "Put the sections of Chapter 9 in the order the author presents them.",
+      "items": [
+        "Substituting Questions",
+        "The 3-D Heuristic",
+        "The Mood Heuristic for Happiness",
+        "The Affect Heuristic"
+      ],
+      "explain": "The chapter defines substitution first, then shows it at three levels: perception (the 3-D heuristic), self-assessment (the mood heuristic for happiness), and belief (the affect heuristic)."
+    },
+    {
+      "id": "c09-6",
+      "unit": "Chapter 9",
+      "unitTitle": "Answering an Easier Question",
+      "section": "Substituting Questions",
+      "kind": "match",
+      "q": "Match each term from Chapter 9 to its meaning.",
+      "pairs": [
+        [
+          "Substitution",
+          "System 1 finds and answers an easier, related question when a hard one has no quick answer"
+        ],
+        [
+          "Target question",
+          "The assessment you intend to produce"
+        ],
+        [
+          "Heuristic question",
+          "The simpler question you answer instead"
+        ],
+        [
+          "Intensity matching",
+          "Fitting the answer to the original question, such as turning the strength of a feeling into a dollar amount"
+        ]
+      ],
+      "explain": "“If a satisfactory answer to a hard question is not found quickly, System 1 will find a related question that is easier and will answer it.”"
+    },
+    {
+      "id": "c37-2",
+      "unit": "Chapter 37",
+      "unitTitle": "Experienced Well-Being",
+      "section": "Experienced Well-Being",
+      "kind": "sort",
+      "q": "Which self does each measure speak to?",
+      "groups": [
+        "Experiencing self",
+        "Remembering self"
+      ],
+      "items": [
+        {
+          "t": "Experience sampling",
+          "g": 0
+        },
+        {
+          "t": "Day Reconstruction Method",
+          "g": 0
+        },
+        {
+          "t": "U-index",
+          "g": 0
+        },
+        {
+          "t": "“All things considered, how satisfied are you with your life as a whole these days?”",
+          "g": 1
+        },
+        {
+          "t": "Cantril ladder (life evaluation)",
+          "g": 1
+        }
+      ],
+      "explain": "Almost all earlier knowledge of well-being came from a question addressed to the remembering self. The author turned to measuring the experiencing self directly, and the chapter concludes the two are “something else entirely.”"
+    },
+    {
+      "id": "c37-1",
+      "unit": "Chapter 37",
+      "unitTitle": "Experienced Well-Being",
+      "section": "Experienced Well-Being",
+      "kind": "mcq",
+      "q": "What did the Gallup-Healthways data show about income and well-being?",
+      "options": [
+        "Experienced well-being and life satisfaction both rise steadily with income.",
+        "Neither experienced well-being nor life satisfaction is related to income.",
+        "Experienced well-being keeps rising with income, while life satisfaction levels off.",
+        "Experienced well-being stops increasing at about $75,000 household income in high-cost areas, while life satisfaction keeps rising."
+      ],
+      "answer": 3,
+      "explain": "Poverty makes one miserable; riches may enhance life satisfaction but do not (on average) improve experienced well-being. Life evaluation and actual experience “are also different.”"
+    },
+    {
+      "id": "c15-4",
+      "unit": "Chapter 15",
+      "unitTitle": "Linda: Less is More",
+      "section": "Opening",
+      "kind": "tf",
+      "q": "True or false: “Mark has blond hair” versus “Mark has hair” produces the same conjunction fallacy as Linda.",
+      "answer": false,
+      "explain": "It causes no fallacy, because the added detail is not more plausible. “In the absence of a competing intuition, logic prevails.”"
+    }
+  ]
+}
