@@ -23,6 +23,9 @@
   function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function dayKey(d) { var x = d || new Date(); return x.getFullYear() + "-" + (x.getMonth() + 1) + "-" + x.getDate(); }
   function numOf(u) { return u.replace(/^\D+/, ""); }
+  /* Words that change from book to book live in questions.json under "labels" (all optional). */
+  var LABELS = { unit: "Chapter", units: "chapters", topic: "Topic", whole: "Whole book" };
+  function unitName(q) { return LABELS.unit + " " + numOf(q.unit) + (q.unitTitle ? ", " + q.unitTitle : ""); }
   var KIND = { tf: "True or false", multi: "Select all that apply", fill: "Fill in the blank", order: "Put in order", match: "Match the pairs", sort: "Sort into groups" };
   function kindLabel(q) {
     if (KIND[q.kind]) return KIND[q.kind];
@@ -52,18 +55,21 @@
     return n;
   }
 
+  /* ---------- question types: to add one, write a function (q, area, keys) and list it here ---------- */
+  var TYPES = {};   // filled in after the functions below are defined (see end of file)
+
   /* ---------- structure ---------- */
   var units = [], titles = {}, scope = $("scope");
   function boot(data) {
     if (!data || !data.questions || !data.questions.length) throw new Error("no questions");
-    Q = data; KEY = "recall-quiz:" + (Q.id || "book");
+    Q = data; Object.assign(LABELS, Q.labels || {}); KEY = "recall-quiz:" + (Q.id || "book");
     state = load(); normalise();
     units = []; titles = {};
     Q.questions.forEach(function (q) { if (units.indexOf(q.unit) < 0) { units.push(q.unit); titles[q.unit] = q.unitTitle || ""; } });
-    $("title").textContent = Q.book;
-    $("sub").textContent = Q.questions.length + " questions across " + units.length + (units.length === 1 ? " chapter" : " chapters") + ". Recall first, then check.";
+    $("title").textContent = Q.book; $("scopeLab").textContent = LABELS.unit;
+    $("sub").textContent = Q.questions.length + " questions across " + units.length + " " + (units.length === 1 ? LABELS.unit.toLowerCase() : LABELS.units) + ". Recall first, then check.";
     scope.textContent = "";
-    scope.appendChild(new Option("Whole book", "all"));
+    scope.appendChild(new Option(LABELS.whole, "all"));
     units.forEach(function (u) { scope.appendChild(new Option(u + (titles[u] ? ": " + titles[u] : ""), u)); });
     $("loadErr").classList.add("hide"); $("homeWrap").classList.remove("hide"); $("stats").classList.remove("hide");
     save(); renderHome();
@@ -119,7 +125,7 @@
     if (n && nq) { $("avail").textContent = "Up to " + Math.min(nq, n) + " of " + n + " ready questions will be asked."; return; }
     $("avail").textContent = n ? n + (n === 1 ? " question is" : " questions are") + " ready with these settings." :
       (mode === "weak" ? "No gaps yet. Answer a few questions and any you miss will appear here." :
-       mode === "due" ? "Nothing is due here right now. Try Everything to practise ahead." : "No questions in this chapter yet.");
+       mode === "due" ? "Nothing is due here right now. Try Everything to practise ahead." : "No questions in this " + LABELS.unit.toLowerCase() + " yet.");
   }
 
   /* ---------- home ---------- */
@@ -193,10 +199,10 @@
   }
   function where(q) {
     var w = el("div", "where"), c = el("div", "chapter");
-    c.appendChild(el("span", "chip", "Chapter " + numOf(q.unit)));
+    c.appendChild(el("span", "chip", LABELS.unit + " " + numOf(q.unit)));
     if (q.unitTitle) c.appendChild(el("span", "chtitle", q.unitTitle));
     w.appendChild(c);
-    var t = el("div", "topic"); t.appendChild(document.createTextNode("Topic: ")); t.appendChild(el("mark", null, q.section)); w.appendChild(t);
+    var t = el("div", "topic"); t.appendChild(document.createTextNode(LABELS.topic + ": ")); t.appendChild(el("mark", null, q.section)); w.appendChild(t);
     w.appendChild(el("span", "kind", kindLabel(q)));
     return w;
   }
@@ -211,15 +217,14 @@
     p.appendChild(area);
     var keys = el("p", "keys"); p.appendChild(keys);
     ctx = null;
-    var TYPES = { mcq: mcq, recall: recall, multi: multi, fill: fill, order: order, match: match, sort: sort };
-    if (q.kind === "tf") mcq(Object.assign({}, q, { options: ["True", "False"], answer: q.answer ? 0 : 1 }), area, keys);
+        if (q.kind === "tf") mcq(Object.assign({}, q, { options: ["True", "False"], answer: q.answer ? 0 : 1 }), area, keys);
     else (TYPES[q.kind] || mcq)(q, area, keys);
     var quit = el("button", "btn", "End session"); quit.style.marginTop = "18px"; quit.style.fontWeight = "500";
     quit.addEventListener("click", function () { if (pos > 0 || confirm("Leave this session?")) { ctx = null; goHome(); } });
     p.appendChild(quit);
   }
   function reread(q) {
-    var r = el("p", "reread"); r.appendChild(document.createTextNode("To go deeper, reread ")); r.appendChild(el("b", null, "Chapter " + numOf(q.unit) + (q.unitTitle ? ", " + q.unitTitle : "")));
+    var r = el("p", "reread"); r.appendChild(document.createTextNode("To go deeper, reread ")); r.appendChild(el("b", null, unitName(q)));
     r.appendChild(document.createTextNode(", topic ")); r.appendChild(el("b", null, q.section)); r.appendChild(document.createTextNode("."));
     return r;
   }
@@ -397,7 +402,7 @@
   }
 
   /* ---------- match the pairs (tap left, then tap right) ---------- */
-  var PAL = ["#ff5d73", "#12b5a6", "#7c5cff", "#ff9f1c", "#2743d6", "#1e8a63"];
+  var PAL = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)", "var(--acc)", "var(--ok)"];
   function tint(c) { return "color-mix(in srgb," + c + " 16%,var(--card))"; }
   function match(q, area, keys) {
     var L = q.pairs.map(function (p) { return p[0]; }), R = shuffle(q.pairs.map(function (p, i) { return { t: p[1], i: i }; }));
@@ -527,7 +532,7 @@
   }
   var VTEXT = { excellent: "Excellent", pass: "Pass", fail: "Fail" };
   function fmt(n) { return String(Math.round(n * 10) / 10); }
-  function scopeName() { return scope.value === "all" ? "Whole book" : scope.value; }
+  function scopeName() { return scope.value === "all" ? LABELS.whole : scope.value; }
   function finish() {
     stopTimer(); stopTotal(); ctx = null; var p = panel(), t = score.got + score.part + score.miss;
     if (t === 0) {
@@ -560,7 +565,7 @@
     if (missed.length) {
       var h = el("p", "note", "Reread these before the next session. They will come back sooner."); h.style.textAlign = "left"; box.appendChild(h);
       var ul = el("ul", "revisit"); ul.style.textAlign = "left";
-      missed.forEach(function (q) { var li = el("li", null, q.q); li.appendChild(el("span", null, "Chapter " + numOf(q.unit) + (q.unitTitle ? ", " + q.unitTitle : "") + ". Topic: " + q.section)); ul.appendChild(li); });
+      missed.forEach(function (q) { var li = el("li", null, q.q); li.appendChild(el("span", null, unitName(q) + ". " + LABELS.topic + ": " + q.section)); ul.appendChild(li); });
       box.appendChild(ul);
     }
     var a = el("div", "act"), again = el("button", "btn main", "Practise again"), home = el("button", "btn", "Back to start");
@@ -596,7 +601,7 @@
   function renderStats() {
     var s = $("stats"); s.textContent = "";
     s.appendChild(el("h2", null, "Where you stand"));
-    if (!Object.keys(state.items).length) s.appendChild(el("p", "empty", "Nothing yet. Start a session and your chapters and topics will fill in here, with the weak ones marked."));
+    if (!Object.keys(state.items).length) s.appendChild(el("p", "empty", "Nothing yet. Start a session and your " + LABELS.units + " and topics will fill in here, with the weak ones marked."));
     units.forEach(function (u) {
       var qs = Q.questions.filter(function (q) { return q.unit === u; });
       var solid = qs.filter(function (q) { var it = state.items[q.id]; return it && it.box >= 3; }).length;
@@ -617,7 +622,7 @@
       });
       d.appendChild(ul); s.appendChild(d);
     });
-    s.appendChild(el("p", "note", "Solid means answered right several times with growing gaps. Open a chapter to see its topics. Topics in red are ones you have missed."));
+    s.appendChild(el("p", "note", "Solid means answered right several times with growing gaps. Open a " + LABELS.unit.toLowerCase() + " to see its topics. Topics in red are ones you have missed."));
   }
 
   /* ---------- backup ---------- */
@@ -641,30 +646,5 @@
 
   loadQuestions();
 
-  /* ---------- theming ---------- */
-  var THEMES = [["classic","Classic"],["lego","Lego"],["clay","Clay"],["pastel","Pastel"],["comic","Comic book"],["whiteboard","Whiteboard"],["anime","Anime"],["watercolor","Watercolor"],["university","University"],["professional","Professional"],["vedic","Vedic"],["ayurveda","Ayurveda"],["history","Indian History"],["universe","Universe"],["maths","Maths"],["vmaths","Vedic Maths"],["geometry","Geometry"],["sanskrit","Sanskrit"],["exercise","Exercise"],["food","Food"],["yoga","Yoga"],["meditation","Meditation"],["brain","Healthy Brain"],["social","Talk to People"],["music","Music"],["art","Art"]];
-  var tstate = { t: document.documentElement.getAttribute("data-theme") || "classic", m: document.documentElement.getAttribute("data-mode") || "system" };
-  function applyTheme() {
-    var d = document.documentElement, dark = tstate.m === "dark" || (tstate.m === "system" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
-    d.setAttribute("data-theme", tstate.t); d.setAttribute("data-mode", tstate.m); d.setAttribute("data-scheme", dark ? "dark" : "light");
-    try { localStorage.setItem("recall-quiz:theme", JSON.stringify(tstate)); } catch (e) {}
-    var ms = document.querySelectorAll("#modeSegT button"), i, ts = document.querySelectorAll("#tiles .tile");
-    for (i = 0; i < ms.length; i++) ms[i].setAttribute("aria-pressed", ms[i].getAttribute("data-m") === tstate.m ? "true" : "false");
-    for (i = 0; i < ts.length; i++) ts[i].setAttribute("aria-pressed", ts[i].getAttribute("data-t") === tstate.t ? "true" : "false");
-  }
-  (function initTheme() {
-    var tiles = document.getElementById("tiles"), panel = document.getElementById("themePanel"), btn = document.getElementById("themeBtn");
-    if (!tiles || !btn) return;
-    THEMES.forEach(function (t) {
-      var b = el("button", "tile"); b.type = "button"; b.setAttribute("data-t", t[0]);
-      b.appendChild(el("div", "tmas")); var sw = el("div", "tsw"); sw.appendChild(el("i")); sw.appendChild(el("i")); sw.appendChild(el("i")); b.appendChild(sw);
-      b.appendChild(el("div", "tbtn", "Go")); b.appendChild(el("div", "tnm", t[1]));
-      b.addEventListener("click", function () { tstate.t = t[0]; applyTheme(); });
-      tiles.appendChild(b);
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("#modeSegT button"), function (b) { b.addEventListener("click", function () { tstate.m = b.getAttribute("data-m"); applyTheme(); }); });
-    btn.addEventListener("click", function () { var open = panel.classList.toggle("hide") === false; btn.setAttribute("aria-expanded", open ? "true" : "false"); });
-    if (window.matchMedia) { var mq = matchMedia("(prefers-color-scheme: dark)"), f = function () { if (tstate.m === "system") applyTheme(); }; if (mq.addEventListener) mq.addEventListener("change", f); else if (mq.addListener) mq.addListener(f); }
-    applyTheme();
-  })();
+  TYPES = { mcq: mcq, recall: recall, multi: multi, fill: fill, order: order, match: match, sort: sort };
 })();

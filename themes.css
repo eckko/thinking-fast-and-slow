@@ -173,7 +173,6 @@ h1{background:var(--grad);-webkit-background-clip:text;background-clip:text;colo
 .shead:hover{filter:none;background:var(--cobalt-soft)}
 
 /* picture in the header and a faint stamp on the question card */
-.top>div:first-child{display:flex;gap:12px;align-items:center}
 .mascot{flex:none;width:58px;height:58px;background:var(--mascot) center/contain no-repeat}
 .q-card::after{content:"";position:absolute;right:10px;bottom:10px;width:84px;height:84px;background:var(--mascot) center/contain no-repeat;opacity:.10;pointer-events:none}
 
